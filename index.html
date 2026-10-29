@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher Red Signal</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+.card {
+    background: white;
+    padding: 30px 20px;
+    border-radius: 20px;
+    text-align: center;
+    width: 85%;
+    max-width: 380px;
+}
+input {
+    padding: 12px;
+    width: 85%;
+    margin: 15px 0 25px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+button {
+    width: 210px;
+    height: 210px;
+    border-radius: 50%;
+    border: 8px solid #ffcaca;
+    background: #d00000;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 8px #850000;
+}
+button:disabled {
+    opacity: 0.6;
+}
+#status {
+    margin-top: 25px;
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+<div class="card">
+    <h1>Teacher Red Signal</h1>
+    <p>Press the button to send an alert.</p>
+
+    <input id="pin" type="password"
+           placeholder="Enter signal PIN">
+
+    <br>
+
+    <button id="signal" onclick="sendSignal()">
+        PULL<br>RED SIGNAL
+    </button>
+
+    <p id="status"></p>
+</div>
+
+<script>
+async function sendSignal() {
+    const button = document.getElementById("signal");
+    const status = document.getElementById("status");
+    const pin = document.getElementById("pin").value;
+
+    if (!pin) {
+        status.textContent = "Enter your PIN first.";
+        return;
+    }
+
+    button.disabled = true;
+    status.textContent = "Sending alert...";
+
+    try {
+        const response = await fetch("/signal", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({pin: pin})
+        });
+
+        const result = await response.json();
+        status.textContent = result.message;
+        status.style.color = result.success ? "green" : "red";
+    } catch (error) {
+        status.textContent = "Connection failed. Try again.";
+    } finally {
+        button.disabled = false;
+    }
+}
+</script>
+</body>
+</html>
